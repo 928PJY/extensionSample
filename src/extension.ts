@@ -4,7 +4,6 @@
 
 import { workspace, window, ExtensionContext, commands, Event, Uri, ViewColumn, TextDocument, Selection } from "vscode";
 import * as path from "path";
-import * as ConstVariable from "./constVariable";
 
 let testuri;
 let hUri;
@@ -28,6 +27,7 @@ function showPreview(uri?: Uri, sideBySide: boolean = false) {
         }
     }
 
+    // TODO: Never mind, there is hard code to test. Please change it to your path
     var HtmlUrl = "file:///E:/SeedProject/docfx-seed/_site/articles/docfxPreview.html";
 
     let thenable = commands.executeCommand("vscode.previewHtml",
