@@ -1,15 +1,15 @@
 <!DOCTYPE html><!--[if IE]><![endif]--><html><head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Getting Started with docfx | docfx seed website </title>
+    <title>Engineering Guidelines | docfx seed website </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Getting Started with docfx | docfx seed website ">
+    <meta name="title" content="Engineering Guidelines | docfx seed website ">
     <meta name="generator" content="docfx 1.0.0.0">
     
-    <link rel="shortcut icon" href="e:\SeedProject\docfx-seed\_site\favicon.ico">
-    <link rel="stylesheet" href="e:\SeedProject\docfx-seed\_site\styles\docfx.vendor.css">
-    <link rel="stylesheet" href="e:\SeedProject\docfx-seed\_site\styles\docfx.css">
-    <link rel="stylesheet" href="e:\SeedProject\docfx-seed\_site\styles\main.css">
+    <link rel="shortcut icon" href="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\favicon.ico">
+    <link rel="stylesheet" href="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\docfx.vendor.css">
+    <link rel="stylesheet" href="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\docfx.css">
+    <link rel="stylesheet" href="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\main.css">
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     <meta property="docfx:rel" content="../">
@@ -29,7 +29,7 @@
               </button>
               
               <a class="navbar-brand" href="../index.html">
-                <img class="svg" id="logo" src="e:\SeedProject\docfx-seed\_site\logo.svg" alt>
+                <img class="svg" id="logo" src="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\logo.svg" alt>
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -68,16 +68,55 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid><h1 id="getting-started-with-docfx" sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="1" sourceendlinenumber="2">Getting Started with <code>docfx</code></h1>
-<h2 id="getting-started" sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="4" sourceendlinenumber="5">Getting Started</h2>
-<p sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="7" sourceendlinenumber="7">This is a seed. <img src="e:\SeedProject\docfx-seed\_site\articles\images\seed.jpg" alt="Seed" sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="7" sourceendlinenumber="7"></p>
-<p sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="9" sourceendlinenumber="9"><code>docfx</code> is an API documentation generator for .NET, currently support C# and VB. It has the ability to extract triple slash comments out from your source code. What's more, it has syntax to link additional files to API to add additional remarks. <code>docfx</code> will scan your source code and your additional conceptual files and generate a complete HTML documentation website for you. <code>docfx</code> provides the flexibility for you to customize the website through templates. We currently have several embedded templates, including websites containing pure static html pages and also website managed by AngularJS.</p>
-<ul sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="11" sourceendlinenumber="14">
-<li sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="11" sourceendlinenumber="11">Click &quot;View Source&quot; for an API to route to the source code in GitHub (your API must be pushed to GitHub)</li>
-<li sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="12" sourceendlinenumber="12"><code>docfx</code> provide DNX version for cross platform use.</li>
-<li sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="13" sourceendlinenumber="13"><code>docfx</code> can be used within Visual Studio seamlessly. <strong>NOTE</strong> offical <code>docfx.msbuild</code> nuget package is now in pre-release version. You can also build your own with source code and use it locally.</li>
-<li sourcefile="articles\docfx_getting_started.md" sourcestartlinenumber="14" sourceendlinenumber="14">We support <strong>Docfx Flavored Markdown(DFM)</strong> for writing conceptual files. DFM is <strong>100%</strong> compatible with <em>Github Flavored Markdown(GFM)</em> and add several new features including <em>file inclusion</em>, <em>cross reference</em>, and <em>yaml header</em>.  </li>
+            <article class="content wrap" id="_content" data-uid><h1 id="engineering-guidelines" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="1" sourceendlinenumber="2">Engineering Guidelines</h1>
+<h2 id="basics" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="4" sourceendlinenumber="5">Basics</h2>
+<h3 id="copyright-header-and-license-notice" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="7" sourceendlinenumber="7">Copyright header and license notice</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="8" sourceendlinenumber="8">All source code files require the following exact header according to its language (please do not make any changes to it).</p>
+<blockquote sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="10" sourceendlinenumber="10"><p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="10" sourceendlinenumber="10">extension: <strong>.cs</strong></p>
+<pre sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="12" sourceendlinenumber="15"><code class="lang-csharp">// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+</code></pre><p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="17" sourceendlinenumber="17">extension: <strong>.js</strong></p>
+<pre sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="19" sourceendlinenumber="21"><code class="lang-js">// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.
+</code></pre><p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="23" sourceendlinenumber="23">extension: <strong>.css</strong></p>
+<pre sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="25" sourceendlinenumber="27"><code class="lang-css">/* Copyright (c) Microsoft Corporation. All Rights Reserved. Licensed under the MIT License. See License.txt in the project root for license information. */
+</code></pre><p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="29" sourceendlinenumber="29">extension: <strong>.tmpl</strong>, <strong>.tmpl.partial</strong></p>
+<pre sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="31" sourceendlinenumber="33"><code class="lang-mustache">{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+</code></pre></blockquote>
+<h3 id="external-dependencies" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="35" sourceendlinenumber="35">External dependencies</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="36" sourceendlinenumber="36">This refers to dependencies on projects (i.e. NuGet packages) outside of the <code>docfx</code> repo, and especially outside of Microsoft. Adding new dependencies require additional approval.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="38" sourceendlinenumber="38">Current approved dependencies are:</p>
+<ul sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="39" sourceendlinenumber="43">
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="39" sourceendlinenumber="39">Newtonsoft.Json</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="40" sourceendlinenumber="40">Jint</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="41" sourceendlinenumber="41">HtmlAgilityPack</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="42" sourceendlinenumber="42">Nustache</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="43" sourceendlinenumber="43">YamlDotNet</li>
 </ul>
+<h3 id="code-reviews-and-checkins" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="45" sourceendlinenumber="45">Code reviews and checkins</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="46" sourceendlinenumber="46">To help ensure that only the highest quality code makes its way into the project, please submit all your code changes to GitHub as PRs. This includes runtime code changes, unit test updates, and deployment scripts. For example, sending a PR for just an update to a unit test might seem like a waste of time but the unit tests are just as important as the product code and as such, reviewing changes to them is also just as important.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="48" sourceendlinenumber="48">The advantages are numerous: improving code quality, more visibility on changes and their potential impact, avoiding duplication of effort, and creating general awareness of progress being made in various areas.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="50" sourceendlinenumber="50">In general a PR should be signed off(using the <span class="emoji" shortcode="+1">&#128077;</span> emoticon) by the Owner of that code.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="52" sourceendlinenumber="52">To commit the PR to the repo <strong>do not use the Big Green Button</strong>. Instead, do a typical push that you would use with Git (e.g. local pull, rebase, merge, push).</p>
+<h2 id="source-code-management" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="54" sourceendlinenumber="55">Source Code Management</h2>
+<h3 id="branch-strategy" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="57" sourceendlinenumber="57">Branch strategy</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="58" sourceendlinenumber="58">In general:</p>
+<ul sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="60" sourceendlinenumber="62">
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="60" sourceendlinenumber="60"><code>master</code> has the code for the latest release on NuGet.org. (e.g. <code>1.0.0</code>, <code>1.1.0</code>)</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="61" sourceendlinenumber="61"><code>dev</code> has the code that is being worked on but not yet released. This is the branch into which devs normally submit pull requests and merge changes into. We run daily CI towards <code>dev</code> branch and generate pre-release nuget package, e.g. <code>1.0.1-alpha-9-abcdefsd</code>.</li>
+<li sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="62" sourceendlinenumber="62"><code>hotfix</code> has the code for fixing <code>master</code> bug after it is released. <code>hotfix</code> changes will be merged back to <code>master</code> and <code>dev</code> once it is verified.</li>
+</ul>
+<h3 id="solution-and-project-folder-structure-and-naming" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="64" sourceendlinenumber="64">Solution and project folder structure and naming</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="65" sourceendlinenumber="65">Solution files go in the repo root. The default entry point is <code>All.sln</code>.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="67" sourceendlinenumber="67">Every project also needs a <code>project.json</code> and a matching <code>.xproj</code> file. This <code>project.json</code> is the source of truth for a project's dependencies and configuration options.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="69" sourceendlinenumber="69">Solution need to contain solution folders that match the physical folder (<code>src</code>, <code>test</code>, <code>tools</code>, etc.).</p>
+<h3 id="assembly-naming-pattern" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="71" sourceendlinenumber="71">Assembly naming pattern</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="72" sourceendlinenumber="72">The general naming pattern is <code>Microsoft.DocAsCode.&lt;area&gt;.&lt;subarea&gt;</code>.</p>
+<h3 id="unit-tests" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="74" sourceendlinenumber="74">Unit tests</h3>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="75" sourceendlinenumber="75">We use <em>xUnit.net</em> for all unit testing. </p>
+<h2 id="coding-standards" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="77" sourceendlinenumber="78">Coding Standards</h2>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="79" sourceendlinenumber="79">Please refer to <a href="csharp_coding_standards.md" data-raw-source="[C# Coding standards](csharp_coding_standards.md)" sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="79" sourceendlinenumber="79">C# Coding standards</a> for detailed guideline for C# coding standards.</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="81" sourceendlinenumber="81"><strong>TODO</strong> Template Coding standards</p>
+<p sourcefile="articles\engineering_guidelines.md" sourcestartlinenumber="83" sourceendlinenumber="83"><strong>TODO</strong> Template Preprocess JS Coding standards</p>
 </article>
           </div>
           
@@ -86,7 +125,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a class="contribution-link" href="https://github.com/docascode/docfx-seed/blob/master/articles/docfx_getting_started.md/#L1">Improve this Doc</a>
+                    <a class="contribution-link" href="https://github.com/docascode/docfx-seed/blob/master/articles/engineering_guidelines.md/#L1">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
@@ -112,10 +151,9 @@
       </footer>
     </div>
     
-    
-    <script type="text/javascript" src="e:\SeedProject\docfx-seed\_site\styles\docfx.vendor.js"></script>
-    <script type="text/javascript" src="e:\SeedProject\docfx-seed\_site\styles\docfx.js"></script>
-    <script type="text/javascript" src="e:\SeedProject\docfx-seed\_site\styles\main.js"></script>
+    <script type="text/javascript" src="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\docfx.vendor.js"></script>
+    <script type="text/javascript" src="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\docfx.js"></script>
+    <script type="text/javascript" src="f:\Test\Test\docfxpreviewSample\Testproject\docfx-seed\_site\styles\main.js"></script><script type="text/javascript" src="f:\Test\Test\docfxpreviewSample\src\htmlUpdate.js"></script>
   
 
 </body></html>
