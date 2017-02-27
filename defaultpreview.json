@@ -1,5 +1,11 @@
 {
   "outputFolder": "_site",
   "markupResultLocation": "article",
-  "port": "4001"
+  "port": "4001",
+  "reference": {
+    "link": "href",
+    "script": "src",
+    "img": "src"
+  },
+  "pageRefreshFunctionName": ""
 }
