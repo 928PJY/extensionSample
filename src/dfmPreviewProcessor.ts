@@ -106,16 +106,17 @@ export class DfmPreviewProcessor {
     }
 
     public initailPath(context: ExtensionContext) {
+        let defaultConfig;
+        let customeConfig;
         let baseDir = workspace.rootPath;
         let relativePath;
-        let customeConfigPath;
         let defaultConfigPath;
         let outputFolder;
         if (!baseDir) {
             // Have not open a folder
             // TODO: only dfmPreview
         } else {
-            if (!fs.existsSync(path.join(baseDir, ConstVariable.docfxConfigFilename))) {
+            if (!fs.existsSync(path.join(baseDir, ConstVariable.docfxConfigFilename)) && !fs.existsSync(path.join(baseDir, ConstVariable.openpublishingConfigFileName))) {
                 window.showErrorMessage("Please Open docfx project root fodler");
                 return;
             } else {
@@ -126,29 +127,43 @@ export class DfmPreviewProcessor {
                 relativePath = fileName.substr(rootPathLength + 1, fileName.length - rootPathLength);
             }
         }
-
-        var defaultConfigFilePath = context.asAbsolutePath(ConstVariable.defaultPreviewConfigFilename);
+        let defaultConfigFilePath = context.asAbsolutePath(ConstVariable.defaultPreviewConfigFilename);
         try {
-            let defaultConfig = JSON.parse(fs.readFileSync(defaultConfigFilePath).toString());
-            outputFolder = defaultConfig[ConstVariable.outputFolderConfig];
+            defaultConfig = JSON.parse(fs.readFileSync(defaultConfigFilePath).toString());
         } catch (e) {
             console.log(e);
         }
-
-        customeConfigPath = path.join(baseDir, ConstVariable.previewConfigFilename);
+        let customeConfigPath = path.join(baseDir, ConstVariable.previewConfigFilename);
         if (fs.existsSync(customeConfigPath)) {
-            let customeConfig = JSON.parse(fs.readFileSync(customeConfigPath).toString());
-            if (customeConfig[ConstVariable.outputFolderConfig] != null) {
-                outputFolder = customeConfig[ConstVariable.outputFolderConfig];
-            }
+            customeConfig = JSON.parse(fs.readFileSync(customeConfigPath).toString());
+        }
+        let config = this.mergeConfig(defaultConfig, customeConfig);
+
+        let fileName = path.basename(relativePath);
+        let targetHtml = ConstVariable.filePathPrefix + path.join(baseDir, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length),  ConstVariable.docfxTempPreviewFile);
+
+        this._docfxPreviewFilePath = targetHtml;
+
+        this._pageUpdateJsFilePath = context.asAbsolutePath(path.join("src", "htmlUpdate.js"));
+    }
+
+    private mergeConfig(defaultConfig, customeConfig) {
+        if (customeConfig == null) {
+            return defaultConfig;
         }
 
-        let originHtmlPath = ConstVariable.filePathPrefix + path.join(baseDir, outputFolder, path.dirname(relativePath), ConstVariable.docfxTempPreviewFile);
+        let config = defaultConfig;
 
-        this._docfxPreviewFilePath = originHtmlPath;
-        this._pageUpdateJsFilePath = context.asAbsolutePath(path.join("src", "htmlUpdate.js"))
+        if (customeConfig["buildSourceFolder"] != null)
+            config["buildSourceFolder"] = customeConfig["buildSourceFolder"];
 
-        return originHtmlPath;
+        if (customeConfig["buildOutputSubFolder"] != null)
+            config["buildOutputSubFolder"] = customeConfig["buildOutputSubFolder"];
+
+        if (customeConfig["outputFolder"] != null)
+            config["outputFolder"] = customeConfig["outputFolder"];
+
+        return config;
     }
 
     protected writeToStdin(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
@@ -175,7 +190,6 @@ export class DfmPreviewProcessor {
         if (window.activeTextEditor) {
             resource = window.activeTextEditor.document.uri;
         } else {
-            // This is most likely toggling the preview
             return commands.executeCommand("DFM.showSource");
         }
 

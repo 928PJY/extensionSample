@@ -1,5 +1,7 @@
 {
   "outputFolder": "_site",
+  "buildSourceFolder": "articles",
+  "buildOutputSubFolder": "articles",
   "markupResultLocation": "article",
   "port": "4001",
   "reference": {

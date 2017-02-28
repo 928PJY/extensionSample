@@ -12,3 +12,4 @@ export const defaultPreviewConfigFilename = "defaultpreview.json";
 export const previewConfigFilename = "preview.json";
 export const outputFolderConfig = "outputFolder";
 export const docfxConfigFilename = "docfx.json";
+export const openpublishingConfigFileName = ".openpublishing.build.ps1";

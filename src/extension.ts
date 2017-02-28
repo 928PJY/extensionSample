@@ -37,12 +37,12 @@ export function activate(context: ExtensionContext) {
             case ConstVariable.previewContent:
                 if (!dfmPreviewProcessor.isMarkdownFileChange) {
                     res.writeHead(200, { "Content-Type": "text/plain" });
-                    res.write("T");
+                    res.write("F");
                     res.end();
                 } else {
                     // File change
                     res.writeHead(200, { "Content-Type": "text/plain" });
-                    res.write("F");
+                    res.write("T");
                     res.write(dfmPreviewProcessor.content)
                     res.end();
                     dfmPreviewProcessor.isMarkdownFileChange = false;
