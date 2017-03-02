@@ -96,4 +96,5 @@ function showSource() {
 function showPreview(context: ExtensionContext,dfmPreviewProcessor,uri?: Uri, sideBySide: boolean = false) {
     dfmPreviewProcessor.initailPath(context);
     dfmPreviewProcessor.callDfm(true);
+    dfmPreviewProcessor.callDfm(false);
 }

@@ -44,13 +44,10 @@ export class DfmPreviewProcessor {
                 }
                 that._isMultipleRead = endCharCode !== that.ENDCODE;
                 if (!that._isMultipleRead) {
+                    that.isMarkdownFileChange = true;
                     if (that._isFirstTime) {
-                        that.isMarkdownFileChange = false;
                         that.showPreviewCore();
                         that._isFirstTime = false;
-                    }
-                    else {
-                        that.isMarkdownFileChange = true;
                     }
                 }
             }

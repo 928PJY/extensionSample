@@ -1,4 +1,5 @@
 $(function () {
+
     var port = $("meta[name='port']")[0].content;
     var pageRefreshFunctionName = $("meta[name='pageRefreshFunctionName']")[0].content;
     var markupTagType = $("meta[name='markupTagType']")[0].content;
@@ -13,23 +14,32 @@ $(function () {
                     //$("article.content").html(data.substring(1));
                     var test = $("div.content")
                     var select = (markupTagType + "." + markupClassName).toString();
-                    $(select).html(data.substring(1));
-                    
+                    $(select).each(function () {
+                        if ($(this).children(".breadcrumbs").length > 0)
+                            return;
+                        $(this).html(data.substring(1));
+                    });
+
+
                     window[pageRefreshFunctionName]();
+
+                    // In topic TOC
+                    // docsToc.renderInTopicToc();
+                    // window[pageRefreshFunctionName]();
 
                     // var bodyEle = $("body").html();
                     // $("body").html(data.substring(1));
 
                     // var references = $("script");
-                    // //var previousEle = $("script[src$='docfx.js']").prev();
+                    // // var previousEle = $("script[src$='docfx.js']").prev();
                     // var nextEle = $("script[src$='docfx.js']").next();
                     // if(!nextEle.is('script')){
                     //     nextEle = references.first();
                     // }
                     // $("script[src$='docfx.js']").remove()
                     // nextEle.after($('<script>').attr('type', 'text/javascript').attr('src', 'e:\\SeedProject\\docfx-seed\\_site\\styles\\docfx.js'));
-                    //references.last().after($('<script>').attr('type', 'text/javascript').attr('src', 'e:\\SeedProject\\docfx-seed\\_site\\styles\\docfx.js'));
-                    //docfxprocess();
+                    // references.last().after($('<script>').attr('type', 'text/javascript').attr('src', 'e:\\SeedProject\\docfx-seed\\_site\\styles\\docfx.js'));
+                    // docfxprocess();
                 }
             })
     }, 500);
