@@ -7,12 +7,6 @@ $(function () {
   var show = 'show';
   var hide = 'hide';
 
-  // Styling for tables in conceptual documents using Bootstrap.
-  // See http://getbootstrap.com/css/#tables
-  (function () {
-    $('table').addClass('table table-bordered table-striped table-condensed');
-  })();
-
   //Adjust the position of search box in navbar
   (function () {
     autoCollapse();
@@ -522,6 +516,12 @@ $(function () {
 
 // This function is 
 function previewrefresh() {
+  // Styling for tables in conceptual documents using Bootstrap.
+  // See http://getbootstrap.com/css/#tables
+  (function () {
+    $('table').addClass('table table-bordered table-striped table-condensed');
+  })();
+
   // Styling for alerts.
   (function () {
     $('.NOTE, .TIP').addClass('alert alert-info');

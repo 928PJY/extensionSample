@@ -880,3 +880,7 @@ div.embeddedvideo iframe {
     display: none;
   }
 }
+
+div.test{
+  background-color: #666666;
+}
