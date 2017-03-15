@@ -9,5 +9,5 @@
     "script": "src",
     "img": "src"
   },
-  "pageRefreshFunctionName": ""
+  "pageRefreshFunctionName": "refresh"
 }

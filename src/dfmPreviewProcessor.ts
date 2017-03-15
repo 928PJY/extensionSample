@@ -141,7 +141,7 @@ export class DfmPreviewProcessor {
 
         this._docfxPreviewFilePath = targetHtml;
 
-        this._pageUpdateJsFilePath = context.asAbsolutePath(path.join("src", "htmlUpdate.js"));
+        this._pageUpdateJsFilePath = context.asAbsolutePath(path.join("htmlUpdate.js"));
     }
 
     private mergeConfig(defaultConfig, customeConfig) {
@@ -165,10 +165,10 @@ export class DfmPreviewProcessor {
 
     protected writeToStdin(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
         this._spawn.stdin.write(this.appendWrap("docfxpreview"));
-        this._spawn.stdin.write(this.appendWrap(rootPath));
-        this._spawn.stdin.write(this.appendWrap(filePath));
         this._spawn.stdin.write(this.appendWrap(numOfRow));
         this._spawn.stdin.write(this.appendWrap(docContent));
+        this._spawn.stdin.write(this.appendWrap(rootPath));
+        this._spawn.stdin.write(this.appendWrap(filePath));
         if (isFirstTime) {
             this._spawn.stdin.write(this.appendWrap("True"));
             this._spawn.stdin.write(this.appendWrap(this._docfxPreviewFilePath));

@@ -12,7 +12,6 @@
     "Other"
   ],
   "main": "./out/src/extension",
-  "icon": "img/logo.png",
   "galleryBanner": {
     "color": "#2D2D2D",
     "theme": "dark"

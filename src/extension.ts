@@ -51,6 +51,7 @@ export function activate(context: ExtensionContext) {
             case ConstVariable.matchFromR2L:
                 if (!mapToSelection(parseInt(requestInfo[2]), parseInt(requestInfo[3])))
                     window.showErrorMessage("Selection Range Error");
+                res.end();
                 break;
             case ConstVariable.matchFromL2R:
                 res.writeHead(200, { "Content-Type": "text/plain" });
@@ -58,7 +59,7 @@ export function activate(context: ExtensionContext) {
                 res.end();
                 break;
             default:
-                // TODO: 
+            // TODO: 
         }
     });
 
@@ -93,8 +94,7 @@ function showSource() {
     return commands.executeCommand("workbench.action.navigateBack");
 }
 
-function showPreview(context: ExtensionContext,dfmPreviewProcessor,uri?: Uri, sideBySide: boolean = false) {
+function showPreview(context: ExtensionContext, dfmPreviewProcessor, uri?: Uri, sideBySide: boolean = false) {
     dfmPreviewProcessor.initailPath(context);
     dfmPreviewProcessor.callDfm(true);
-    dfmPreviewProcessor.callDfm(false);
 }
