@@ -6,15 +6,20 @@ import { DfmServiceResult } from './dfmServiceResult';
 
 export class DfmHttpClient {
     // TODO: make the urlPrefix configurable
-    private urlPrefix = "http://localhost:4001";
+    private urlPrefix = "http://localhost:4002";
 
-    async sendPostRequestAsync(command: String, content: String): Promise<DfmServiceResult> {
+    async sendPostRequestAsync(command: String, workspacePath = null, relativePath = null, content = null, isFirstTime = false, docfxPreviewFilePath = null, pageRefreshJsFilePath = null): Promise<DfmServiceResult> {
         let promise = Axios.post(this.urlPrefix, {
             name: command,
-            documentation: content
+            workspacePath: workspacePath,
+            relativePath: relativePath,
+            markdownContent: content,
+            isFirstTime: isFirstTime,
+            docfxPreviewFilePath: docfxPreviewFilePath,
+            pageRefreshJsFilePath: pageRefreshJsFilePath
         });
 
-        let response : AxiosResponse;
+        let response: AxiosResponse;
         try {
             response = await promise;
         } catch (err) {

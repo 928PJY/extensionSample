@@ -9,6 +9,12 @@ $(function () {
     var filePathEscape = filePath.replace(/\\/g, "\\\\");
     var rightClick = false;
 
+    $("link").each(function (index) {
+        var path = $(this).attr("href");
+        if (path.startsWith("https"))
+            $(this).attr("href", path.replace("https", "http"));
+    });
+
     setInterval(function () {
         $.get("http://localhost:4001" + "/previewContent")
             .done(function (data) {

@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-import { workspace, window, ExtensionContext, Uri, commands, ViewColumn} from "vscode";
+import { workspace, window, ExtensionContext, Uri, commands, ViewColumn } from "vscode";
 import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
 import { Common } from "./common";
 import * as ConstVariable from "./ConstVariable";
+import { DfmService } from "./dfmService";
 
 export class DfmPreviewProcessor {
     public isMarkdownFileChange = false;
@@ -16,50 +17,31 @@ export class DfmPreviewProcessor {
     protected _waiting: boolean;
 
     public _docfxPreviewFilePath: string;
-    public _pageUpdateJsFilePath: string;
+    public _pageRefreshJsFilePath: string;
     private _isFirstTime = false;
     private _isMultipleRead = false;
     private ENDCODE = 7; // '\a'
 
     constructor(context: ExtensionContext) {
-        // TODO: make path configurable
-        let exePath = context.asAbsolutePath("./DfmParse/Microsoft.DocAsCode.Dfm.VscPreview.exe");
-        this._spawn = Common.spawn(exePath, {});
-        if (!this._spawn.pid) {
-            window.showErrorMessage("Error: DfmProcess lost!");
-            return;
-        }
         this._waiting = false;
-        let that = this;
+        //this.initialServer(context);
+    }
 
-        this._spawn.stdout.on("data", function (data) {
-            // The output of child process will be cut if it is too long
-            let dfmResult = data.toString();
-            if (dfmResult.length > 0) {
-                let endCharCode = dfmResult.charCodeAt(dfmResult.length - 1);
-                if (that._isMultipleRead) {
-                    that.content += dfmResult;
-                } else {
-                    that.content = dfmResult;
-                }
-                that._isMultipleRead = endCharCode !== that.ENDCODE;
-                if (!that._isMultipleRead) {
-                    that.isMarkdownFileChange = true;
-                    if (that._isFirstTime) {
-                        that.showPreviewCore();
-                        that._isFirstTime = false;
-                    }
+    private async initialServer(context: ExtensionContext) {
+        try {
+            var ServerAvaliable = await DfmService.testServerAvaliable();
+            if (!ServerAvaliable) {
+                // TODO: make path configurable
+                let exePath = context.asAbsolutePath("./DfmParse/Microsoft.DocAsCode.Dfm.VscPreview.exe");
+                this._spawn = Common.spawn(exePath, {});
+                if (!this._spawn.pid) {
+                    window.showErrorMessage("Error: DfmProcess lost!");
+                    return;
                 }
             }
-        });
-
-        this._spawn.stderr.on("data", function (data) {
-            window.showErrorMessage("Error:" + data + "\n");
-        });
-
-        this._spawn.on("exit", function (code) {
-            window.showErrorMessage("Child process exit with code " + code);
-        });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     protected sendMessage(isFirstTime) {
@@ -137,11 +119,11 @@ export class DfmPreviewProcessor {
         let config = this.mergeConfig(defaultConfig, customeConfig);
 
         let fileName = path.basename(relativePath);
-        let targetHtml = ConstVariable.filePathPrefix + path.join(baseDir, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length),  ConstVariable.docfxTempPreviewFile);
+        let targetHtml = ConstVariable.filePathPrefix + path.join(baseDir, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length), ConstVariable.docfxTempPreviewFile);
 
         this._docfxPreviewFilePath = targetHtml;
 
-        this._pageUpdateJsFilePath = context.asAbsolutePath(path.join("htmlUpdate.js"));
+        this._pageRefreshJsFilePath = context.asAbsolutePath(path.join("htmlUpdate.js"));
     }
 
     private mergeConfig(defaultConfig, customeConfig) {
@@ -163,18 +145,13 @@ export class DfmPreviewProcessor {
         return config;
     }
 
-    protected writeToStdin(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
-        this._spawn.stdin.write(this.appendWrap("docfxpreview"));
-        this._spawn.stdin.write(this.appendWrap(numOfRow));
-        this._spawn.stdin.write(this.appendWrap(docContent));
-        this._spawn.stdin.write(this.appendWrap(rootPath));
-        this._spawn.stdin.write(this.appendWrap(filePath));
-        if (isFirstTime) {
-            this._spawn.stdin.write(this.appendWrap("True"));
-            this._spawn.stdin.write(this.appendWrap(this._docfxPreviewFilePath));
-            this._spawn.stdin.write(this.appendWrap(this._pageUpdateJsFilePath));
-        } else {
-            this._spawn.stdin.write(this.appendWrap("False"));
+    protected async writeToStdin(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
+        var response = await DfmService.previewAsync(rootPath, filePath, docContent, isFirstTime, this._docfxPreviewFilePath, this._pageRefreshJsFilePath);
+        this.content = response.data;
+        this.isMarkdownFileChange = true;
+        if (this._isFirstTime) {
+            this.showPreviewCore();
+            this._isFirstTime = false;
         }
     }
 

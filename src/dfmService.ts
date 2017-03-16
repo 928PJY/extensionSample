@@ -8,20 +8,29 @@ import { DfmServiceResult } from './dfmServiceResult';
 export class DfmService {
     private static client = new DfmHttpClient();
 
-    static async previewAsync(content: String): Promise<DfmServiceResult> {
-        if (!content) {
-            return null;
+    static async testServerAvaliable(): Promise<boolean> {
+        try {
+            await DfmService.client.sendPostRequestAsync("testServer", null);
+            return true;
+        } catch (error) {
+            return false;
         }
-
-        return await DfmService.client.sendPostRequestAsync("preview", content);
     }
 
-    static async getTokenTreeAsync(content: String): Promise<DfmServiceResult> {
+    static async previewAsync(workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string): Promise<DfmServiceResult> {
         if (!content) {
             return null;
         }
 
-        return await DfmService.client.sendPostRequestAsync("generateTokenTree", content);
+        return await DfmService.client.sendPostRequestAsync("preview", workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
+    }
+
+    static async getTokenTreeAsync(workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string): Promise<DfmServiceResult> {
+        if (!content) {
+            return null;
+        }
+
+        return await DfmService.client.sendPostRequestAsync("generateTokenTree", workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
     }
 
     static async exitAsync() {
