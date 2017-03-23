@@ -9,43 +9,57 @@ $(function () {
     var filePathEscape = filePath.replace(/\\/g, "\\\\");
     var rightClick = false;
 
-    $("link").each(function (index) {
-        var path = $(this).attr("href");
-        if (path.startsWith("https"))
-            $(this).attr("href", path.replace("https", "http"));
+    document.addEventListener("load", function (event) {
+        console.log("load");
     });
 
+    $(window).load(function () {
+        console.log("window.load")
+    });
+
+    $(document).ready(function() {
+        console.log("ready");
+    });
+
+    // $(window).load(function () {
+    //     $("link").each(function (index) {
+    //         var path = $(this).attr("href");
+    //         if (path.startsWith("https"))
+    //             $(this).attr("href", path.replace("https", "http"));
+    //     });
+    // })
+
     setInterval(function () {
-        $.get("http://localhost:4001" + "/previewContent")
-            .done(function (data) {
-                if (data[0] == 'F') {
-                    // Markdown file does't change, do nothing
-                } else {
-                    //$("article.content").html(data.substring(1));
-                    var test = $("div.content")
-                    var select = (markupTagType + "." + markupClassName).toString();
-                    $(select).each(function () {
-                        if ($(this).children(".breadcrumbs").length > 0)
-                            return;
-                        $(this).html(data.substring(1));
-                    });
-
-                    window[pageRefreshFunctionName]();
-
-                    (function () {
-                        $("[sourcefile]").click(function () {
-                            if ($(this).attr('sourcefile') === filePath) {
-                                rightClick = true;
-                                $.get("http://localhost:" + [port.toString(), "MatchFromRightToLeft", $(this).attr('sourcestartlinenumber'), $(this).attr('sourceendlinenumber')].join("/"));
-                            }
-                            else {
-                                // TODO: add the lineNumber information of file include in Html
-                            }
+            $.get("http://localhost:4001" + "/previewContent")
+                .done(function (data) {
+                    if (data[0] == 'F') {
+                        // Markdown file does't change, do nothing
+                    } else {
+                        //$("article.content").html(data.substring(1));
+                        var test = $("div.content")
+                        var select = (markupTagType + "." + markupClassName).toString();
+                        $(select).each(function () {
+                            if ($(this).children(".breadcrumbs").length > 0)
+                                return;
+                            $(this).html(data.substring(1));
                         });
-                    })();
-                }
-            })
-    }, 500);
+
+                        window[pageRefreshFunctionName]();
+
+                        (function () {
+                            $("[sourcefile]").click(function () {
+                                if ($(this).attr('sourcefile') === filePath) {
+                                    rightClick = true;
+                                    $.get("http://localhost:" + [port.toString(), "MatchFromRightToLeft", $(this).attr('sourcestartlinenumber'), $(this).attr('sourceendlinenumber')].join("/"));
+                                }
+                                else {
+                                    // TODO: add the lineNumber information of file include in Html
+                                }
+                            });
+                        })();
+                    }
+                })
+        }, 500);
 
     // Communication with extension to get the selection range of activeEditor
     setInterval(function () {

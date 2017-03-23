@@ -31,6 +31,10 @@ export function activate(context: ExtensionContext) {
         endLine = event.selections[0].end.line + 1;
     });
 
+    window.onDidChangeTextEditorViewColumn(event => {
+        let test = 1;
+    })
+
     server.on("request", function (req, res) {
         let requestInfo = req.url.split("/");
         switch (requestInfo[1]) {
@@ -95,6 +99,10 @@ function showSource() {
 }
 
 function showPreview(context: ExtensionContext, dfmPreviewProcessor, uri?: Uri, sideBySide: boolean = false) {
-    dfmPreviewProcessor.initailPath(context);
-    dfmPreviewProcessor.callDfm(true);
+    if (isMarkdownFile(window.activeTextEditor.document)) {
+        dfmPreviewProcessor.startPreview(context);
+    }
+    else{
+        window.showErrorMessage("This is not a markdown file")
+    }
 }

@@ -4,36 +4,38 @@ import { AxiosError } from 'axios';
 
 import { DfmHttpClient } from './dfmHttpClient';
 import { DfmServiceResult } from './dfmServiceResult';
+import * as ConstVariable from "./ConstVariable";
 
 export class DfmService {
-    private static client = new DfmHttpClient();
-
-    static async testServerAvaliable(): Promise<boolean> {
-        try {
-            await DfmService.client.sendPostRequestAsync("testServer", null);
-            return true;
-        } catch (error) {
-            return false;
-        }
+    static testServerAvaliable(docfxServicePort) {
+        return new Promise(function (fulfill, reject) {
+            DfmHttpClient.sendPostRequestAsync(docfxServicePort, ConstVariable.testServerAvaliableCommand, null)
+                .then(function (res) {
+                    fulfill(res);
+                })
+                .catch(function (err) {
+                    reject(err);
+                })
+        })
     }
 
-    static async previewAsync(workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string): Promise<DfmServiceResult> {
+    static async previewAsync(docfxServicePort, workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string) {
         if (!content) {
             return null;
         }
 
-        return await DfmService.client.sendPostRequestAsync("preview", workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
+        return await DfmHttpClient.sendPostRequestAsync(docfxServicePort, ConstVariable.previewCommand, workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
     }
 
-    static async getTokenTreeAsync(workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string): Promise<DfmServiceResult> {
+    static async getTokenTreeAsync(docfxServicePort, workspacePath: string, relativePath: string, content: String, isFirstTime: boolean, docfxPreviewFilePath: string, pageRefreshJsFilePath: string) {
         if (!content) {
             return null;
         }
 
-        return await DfmService.client.sendPostRequestAsync("generateTokenTree", workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
+        return await DfmHttpClient.sendPostRequestAsync(docfxServicePort, ConstVariable.tokenTreeCommand, workspacePath, relativePath, content, isFirstTime, docfxPreviewFilePath, pageRefreshJsFilePath);
     }
 
-    static async exitAsync() {
-        await DfmService.client.sendPostRequestAsync("exit", null);
+    static async exitAsync(docfxServicePort) {
+        await DfmHttpClient.sendPostRequestAsync(docfxServicePort, ConstVariable.exitCommand, null);
     }
 }

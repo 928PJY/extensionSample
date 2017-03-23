@@ -3,13 +3,14 @@
 import { default as Axios, AxiosResponse } from 'axios'
 
 import { DfmServiceResult } from './dfmServiceResult';
+import * as ConstVariable from "./ConstVariable";
 
 export class DfmHttpClient {
-    // TODO: make the urlPrefix configurable
-    private urlPrefix = "http://localhost:4002";
+    private static urlPrefix = "http://localhost:";
 
-    async sendPostRequestAsync(command: String, workspacePath = null, relativePath = null, content = null, isFirstTime = false, docfxPreviewFilePath = null, pageRefreshJsFilePath = null): Promise<DfmServiceResult> {
-        let promise = Axios.post(this.urlPrefix, {
+    static async sendPostRequestAsync(port: string, command: String, workspacePath = null, relativePath = null, content = null, isFirstTime = false, docfxPreviewFilePath = null, pageRefreshJsFilePath = null): Promise<AxiosResponse> {
+        let that = this;
+        let promise = Axios.post(this.urlPrefix + port, {
             name: command,
             workspacePath: workspacePath,
             relativePath: relativePath,
@@ -25,7 +26,7 @@ export class DfmHttpClient {
         } catch (err) {
             let record = err.response;
             if (!record) {
-                throw new Error(err)
+                throw new Error(ConstVariable.noServiceErrorMessage);
             }
 
             switch (record.status) {
@@ -37,6 +38,6 @@ export class DfmHttpClient {
                     throw new Error(err);
             }
         }
-        return new DfmServiceResult(response.data, response.headers["content-type"]);
+        return response;
     }
 }
