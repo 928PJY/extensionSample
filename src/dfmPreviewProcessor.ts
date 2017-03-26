@@ -4,7 +4,6 @@ import { workspace, window, ExtensionContext, Uri, commands, ViewColumn } from "
 import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import * as request from "request";
 
 import { Common } from "./common";
 import * as ConstVariable from "./ConstVariable";
@@ -12,29 +11,32 @@ import { DfmService } from "./dfmService";
 
 export class DfmPreviewProcessor {
     public isMarkdownFileChange = false;
-    public content: string;
+    public httpServiceResponse: string;
 
-    protected _spawn: childProcess.ChildProcess;
-    protected _waiting: boolean;
-
-    public _docfxPreviewFilePath: string;
-    public _pageRefreshJsFilePath: string;
+    private _spawn: childProcess.ChildProcess;
+    private _waiting = false;
+    private _builtHtmlPath: string;
+    private _pageRefreshJsFilePath: string;
+    private _docfxPreviewFilePath: string;
     private _isFirstTime = false;
     private _isMultipleRead = false;
-    private _docfxServicePort: string;
-    private ENDCODE = 7; // '\a'
+    private _docfxServerPort: string;
+    private _context: ExtensionContext;
 
     constructor(context: ExtensionContext) {
-        this._waiting = false;
+        this._context = context;
     }
 
-    public startPreview(context: ExtensionContext, port: string) {
-        let config = this.parseConfig(context, workspace.rootPath);
-        this.initailPath(context, config);
-        this._docfxServicePort = config["docfxServicePort"];
+    public startPreview() {
+        let config = this.parseConfig(workspace.rootPath);
+        this.initailPath(config);
+        this._docfxServerPort = config["docfxServerPort"];
 
         let that = this;
-        DfmService.testServerAvaliable(this._docfxServicePort)
+        // Test navigation port
+        // TODO: implement
+
+        DfmService.testServerAvaliable(this._docfxServerPort)
             .then(function (res: any) {
                 // There is already an avaliable Docfx service.
                 that.callDfm(true);
@@ -42,19 +44,43 @@ export class DfmPreviewProcessor {
             .catch(function (err) {
                 if (err.message == ConstVariable.noServiceErrorMessage) {
                     // Port have not been used, start a new Docfx service.
-                    that.newHttpServerAndStartPreview(context);
-                    return ;
+                    that.newHttpServerAndStartPreview();
+                    return;
                 }
                 // Port have been used by anohter process, Show a error massege.
-                window.showErrorMessage("Docfx Service port have been used, if you don't have a item 'DocfxServicePort' in preview.json file, please add it and use another port");
+                window.showErrorMessage("Docfx Service port have been used, if you don't have a item 'docfxServerPort' in preview.json file, please add it and use another port");
             })
+    }
 
-        // Test navigation port
-        // TODO: implement
+    public stopPreview() {
+        let that = this;
+        DfmService.deletePreviewFile(this._docfxServerPort, this._docfxPreviewFilePath)
+            .then(function () {
+                that.killChildProcess();
+            })
+            .catch(function(err){
+                if (!(err.message == ConstVariable.noServiceErrorMessage)) {
+                    window.showErrorMessage(err.message);
+                }
+            })
+    }
+
+    public updatePreviewContent() {
+        this.callDfm(false);
+    }
+
+    private killChildProcess() {
+        // Kill child process
+        DfmService.exit(this._docfxServerPort)
+            .catch(function (err) {
+                if (!(err.message == ConstVariable.noServiceErrorMessage)) {
+                    window.showErrorMessage(err.message);
+                }
+            })
     }
 
     // Calculate two preview path.
-    public initailPath(context: ExtensionContext, config) {
+    private initailPath(config) {
         let workspacePath = workspace.rootPath;
         let relativePath;
         let defaultConfigPath;
@@ -64,7 +90,7 @@ export class DfmPreviewProcessor {
             // TODO: only dfmPreview
         } else {
             if (!fs.existsSync(path.join(workspacePath, ConstVariable.docfxConfigFilename)) && !fs.existsSync(path.join(workspacePath, ConstVariable.openpublishingConfigFileName))) {
-                window.showErrorMessage("Please Open docfx project root fodler");
+                window.showErrorMessage("Please Open project root fodler");
                 return;
             } else {
                 let editor = window.activeTextEditor;
@@ -75,21 +101,28 @@ export class DfmPreviewProcessor {
             }
         }
 
-        let fileName = path.basename(relativePath);
+        let filename = path.basename(relativePath);
+        let filenameWithoutExt = filename.substr(0, filename.length - path.extname(relativePath).length);
+        let builtHtmlPath = path.join(workspacePath, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length), filenameWithoutExt + ".html");
+        this._builtHtmlPath = builtHtmlPath;
         this._docfxPreviewFilePath = ConstVariable.filePathPrefix + path.join(workspacePath, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length), ConstVariable.docfxTempPreviewFile);
 
-        this._pageRefreshJsFilePath = context.asAbsolutePath(path.join("htmlUpdate.js"));
+        if (!fs.existsSync(builtHtmlPath)) {
+            // TODO: add a switch to control this
+            window.showErrorMessage("Please build this project first!");
+        }
+
+        this._pageRefreshJsFilePath = this._context.asAbsolutePath(path.join("htmlUpdate.js"));
     }
 
-
-    private parseConfig(context: ExtensionContext, workspacePath: string) {
+    private parseConfig(workspacePath: string) {
         let defaultConfig;
         let customeConfig;
-        let defaultConfigFilePath = context.asAbsolutePath(ConstVariable.defaultPreviewConfigFilename);
+        let defaultConfigFilePath = this._context.asAbsolutePath(ConstVariable.defaultPreviewConfigFilename);
         try {
             defaultConfig = JSON.parse(fs.readFileSync(defaultConfigFilePath).toString());
-        } catch (e) {
-            console.log(e);
+        } catch (err) {
+            window.showErrorMessage(err);
         }
         let customeConfigPath = path.join(workspacePath, ConstVariable.previewConfigFilename);
         if (fs.existsSync(customeConfigPath)) {
@@ -113,23 +146,23 @@ export class DfmPreviewProcessor {
         if (customeConfig["outputFolder"] != null)
             config["outputFolder"] = customeConfig["outputFolder"];
 
-        if (customeConfig["docfxServicePort"] != null)
-            config["docfxServicePort"] = customeConfig["docfxServicePort"];
+        if (customeConfig["docfxServerPort"] != null)
+            config["docfxServerPort"] = customeConfig["docfxServerPort"];
 
         if (customeConfig["navigationPort"] != null)
             config["navigationPort"] = customeConfig["navigationPort"];
         return config;
     }
 
-    private newHttpServerAndStartPreview(context: ExtensionContext) {
+    private newHttpServerAndStartPreview() {
         // TODO: make path configurable
-        let exePath = context.asAbsolutePath("./DfmParse/DfmHttpService.exe");
+        let exePath = this._context.asAbsolutePath("./DfmParse/DfmHttpService.exe");
         try {
-            // TODO: make it "-p this._docfxServicePort"
-            this._spawn = Common.spawn(exePath + " " + this._docfxServicePort, {});
+            // TODO: make it "-p this._docfxServerPort"
+            this._spawn = Common.spawn(exePath + " " + this._docfxServerPort, {});
         }
-        catch (error) {
-            console.log(error);
+        catch (err) {
+            window.showErrorMessage(err);
         }
         if (!this._spawn.pid) {
             window.showErrorMessage("Error: DfmProcess lost!");
@@ -141,7 +174,7 @@ export class DfmPreviewProcessor {
         });
     }
 
-    protected sendMessage(isFirstTime) {
+    private sendMessage(isFirstTime) {
         let editor = window.activeTextEditor;
         if (!editor) {
             return;
@@ -171,7 +204,7 @@ export class DfmPreviewProcessor {
         }
     }
 
-    public callDfm(isFirstTime) {
+    private callDfm(isFirstTime) {
         if (!this._waiting) {
             this._waiting = true;
             setTimeout(() => {
@@ -181,18 +214,26 @@ export class DfmPreviewProcessor {
         }
     }
 
-    protected async sendHttpRequest(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
-        var response = await DfmService.previewAsync(this._docfxServicePort, rootPath, filePath, docContent, isFirstTime, this._docfxPreviewFilePath, this._pageRefreshJsFilePath);
-        this.content = response.data;
-        this.isMarkdownFileChange = true;
-        if (this._isFirstTime) {
-            this.showPreviewCore();
-            this._isFirstTime = false;
-        }
-    }
-
-    protected appendWrap(content) {
-        return content + "\n";
+    private sendHttpRequest(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
+        let that = this;
+        DfmService.preview(this._docfxServerPort, this._docfxPreviewFilePath, rootPath, filePath, docContent, isFirstTime, this._pageRefreshJsFilePath, this._builtHtmlPath)
+            .then(function (res: any) {
+                that.httpServiceResponse = res.data;
+                that.isMarkdownFileChange = true;
+                if (that._isFirstTime) {
+                    that.showPreviewCore();
+                    that._isFirstTime = false;
+                }
+            })
+            .catch(function (err) {
+                if (err.message == ConstVariable.noServiceErrorMessage) {
+                    // Port have not been used, start a new Docfx service.
+                    that.newHttpServerAndStartPreview();
+                    return;
+                }
+                // TODO: write error to log file
+                window.showErrorMessage("Some unhandled error happened, please contact author on Docfx issues at https://github.com/dotnet/docfx/issues");
+            })
     }
 
     private showPreviewCore() {

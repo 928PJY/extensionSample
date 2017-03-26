@@ -3,7 +3,7 @@
   "buildSourceFolder": "articles",
   "buildOutputSubFolder": "articles",
   "markupResultLocation": "article",
-  "docfxServicePort": "4002",
+  "docfxServerPort": "4002",
   "navigationPort": "4001",
   "reference": {
     "link": "href",

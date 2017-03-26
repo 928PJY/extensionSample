@@ -5,23 +5,48 @@
 import { workspace, window, ExtensionContext, commands, Event, Uri, ViewColumn, TextDocument, Selection } from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import * as net from "net";
 import * as ConstVariable from "./ConstVariable";
 import { DfmPreviewProcessor } from './dfmPreviewProcessor';
+import { DfmService } from "./dfmService";
 
-// TODO: replace all hard code
+// TODO: Implement Log
+// TODO: Add a switch of preview option
+// TODO: 
 export function activate(context: ExtensionContext) {
     let dfmPreviewProcessor = new DfmPreviewProcessor(context);
-    let markupResult = "";
     let showPreviewToSideRegistration = commands.registerCommand("DFM.showPreviewToSide", uri => showPreview(context, dfmPreviewProcessor, uri, true));
+
+    context.subscriptions.push(showPreviewToSideRegistration);
 
     let http = require("http");
     let server = http.createServer();
 
     workspace.onDidChangeTextDocument(event => {
         if (isMarkdownFile(event.document)) {
-            dfmPreviewProcessor.callDfm(false);
+            dfmPreviewProcessor.updatePreviewContent();
         }
     });
+
+    workspace.onDidSaveTextDocument(document => {
+        if (isMarkdownFile(document)) {
+            dfmPreviewProcessor.updatePreviewContent();
+        }
+    })
+
+    workspace.onDidChangeConfiguration(() => {
+        workspace.textDocuments.forEach(document => {
+            if (document.uri.scheme === ConstVariable.markdownScheme) {
+                dfmPreviewProcessor.updatePreviewContent();
+            } else if (document.uri.scheme === ConstVariable.tokenTreeScheme) {
+                // TOD: TokenTree
+            }
+        });
+    })
+
+    workspace.onDidCloseTextDocument(event => {
+        dfmPreviewProcessor.stopPreview();
+    })
 
     let startLine = 0;
     let endLine = 0;
@@ -31,11 +56,8 @@ export function activate(context: ExtensionContext) {
         endLine = event.selections[0].end.line + 1;
     });
 
-    window.onDidChangeTextEditorViewColumn(event => {
-        let test = 1;
-    })
-
     server.on("request", function (req, res) {
+        var test = 1;
         let requestInfo = req.url.split("/");
         switch (requestInfo[1]) {
             case ConstVariable.previewContent:
@@ -47,7 +69,7 @@ export function activate(context: ExtensionContext) {
                     // File change
                     res.writeHead(200, { "Content-Type": "text/plain" });
                     res.write("T");
-                    res.write(dfmPreviewProcessor.content)
+                    res.write(dfmPreviewProcessor.httpServiceResponse)
                     res.end();
                     dfmPreviewProcessor.isMarkdownFileChange = false;
                 }
@@ -62,10 +84,12 @@ export function activate(context: ExtensionContext) {
                 res.write(startLine + " " + endLine);
                 res.end();
                 break;
-            default:
-            // TODO: 
         }
     });
+
+    server.on("error", function (err) {
+        window.showErrorMessage("Navigation port have been used by other process, if you don't have 'navigatePort' item in your preview.json file, please add this item and use another port");
+    })
 
     server.listen(4001);
 }
@@ -100,9 +124,9 @@ function showSource() {
 
 function showPreview(context: ExtensionContext, dfmPreviewProcessor, uri?: Uri, sideBySide: boolean = false) {
     if (isMarkdownFile(window.activeTextEditor.document)) {
-        dfmPreviewProcessor.startPreview(context);
+        dfmPreviewProcessor.startPreview();
     }
-    else{
+    else {
         window.showErrorMessage("This is not a markdown file")
     }
 }
