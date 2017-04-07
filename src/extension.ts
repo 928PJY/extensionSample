@@ -62,11 +62,11 @@ export function activate(context: ExtensionContext) {
         switch (requestInfo[1]) {
             case ConstVariable.previewContent:
                 if (!dfmPreviewProcessor.isMarkdownFileChange) {
-                    res.writeHead(200, { "Content-Type": "text/plain" });
+                     res.writeHead(200, { "Content-Type": "text/plain" });
                     res.write("F");
                     res.end();
                 } else {
-                    // File change
+                    // File changed
                     res.writeHead(200, { "Content-Type": "text/plain" });
                     res.write("T");
                     res.write(dfmPreviewProcessor.httpServiceResponse)

@@ -20,9 +20,7 @@ $(function () {
 
         $.get("http://localhost:4001" + "/previewContent")
             .done(function (data) {
-                if (data[0] == 'F') {
-                    // Markdown file does't change, do nothing
-                } else {
+                if (data[0] == 'T') {
                     var test = $("div.content")
                     var select = (markupTagType + "." + markupClassName).toString();
                     $(select).each(function () {
@@ -32,6 +30,12 @@ $(function () {
                     });
 
                     window[pageRefreshFunctionName]();
+
+                    if ($("h1[sourcefile]").length !== 1) {
+                        var secondOne = $("h1[sourcefile]").filter(function (index) { return index < 2 }).last();
+                        $("h1[sourcefile]").first().text(secondOne.text());
+                        secondOne.empty();
+                    }
 
                     (function () {
                         $("[sourcefile]").click(function () {

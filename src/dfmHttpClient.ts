@@ -9,14 +9,13 @@ export class DfmHttpClient {
     private static urlPrefix = "http://localhost:";
 
     static async sendPostRequestAsync(port: string, command: String, previewFilePath = null, workspacePath = null, relativePath = null, content = null, isFirstTime = false, pageRefreshJsFilePath = null, builtHtmlPath = null): Promise<AxiosResponse> {
-        let that = this;
         let promise = Axios.post(this.urlPrefix + port, {
             name: command,
             previewFilePath: previewFilePath,
             workspacePath: workspacePath,
             relativePath: relativePath,
             markdownContent: content,
-            isFirstTime: isFirstTime,
+            writeTempPreviewFile: isFirstTime,
             builtHtmlPath: builtHtmlPath,
             pageRefreshJsFilePath: pageRefreshJsFilePath
         });

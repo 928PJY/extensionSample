@@ -20,7 +20,7 @@ export class DfmPreviewProcessor {
     private _docfxPreviewFilePath: string;
     private _isFirstTime = false;
     private _isMultipleRead = false;
-    private _docfxServerPort: string;
+    private _serverPort: string;
     private _context: ExtensionContext;
 
     constructor(context: ExtensionContext) {
@@ -30,13 +30,14 @@ export class DfmPreviewProcessor {
     public startPreview() {
         let config = this.parseConfig(workspace.rootPath);
         this.initailPath(config);
-        this._docfxServerPort = config["docfxServerPort"];
+        this._serverPort = config["serverPort"];
 
         let that = this;
+
         // Test navigation port
         // TODO: implement
 
-        DfmService.testServerAvaliable(this._docfxServerPort)
+        DfmService.testServerAvaliable(this._serverPort)
             .then(function (res: any) {
                 // There is already an avaliable Docfx service.
                 that.callDfm(true);
@@ -48,13 +49,13 @@ export class DfmPreviewProcessor {
                     return;
                 }
                 // Port have been used by anohter process, Show a error massege.
-                window.showErrorMessage("Docfx Service port have been used, if you don't have a item 'docfxServerPort' in preview.json file, please add it and use another port");
+                window.showErrorMessage("Docfx Service port have been used, if you don't have a item 'serverPort' in preview.json file, please add it and use another port");
             })
     }
 
     public stopPreview() {
         let that = this;
-        DfmService.deletePreviewFile(this._docfxServerPort, this._docfxPreviewFilePath)
+        DfmService.deletePreviewFile(this._serverPort, this._docfxPreviewFilePath)
             .then(function () {
                 that.killChildProcess();
             })
@@ -71,7 +72,7 @@ export class DfmPreviewProcessor {
 
     private killChildProcess() {
         // Kill child process
-        DfmService.exit(this._docfxServerPort)
+        DfmService.exit(this._serverPort)
             .catch(function (err) {
                 if (!(err.message == ConstVariable.noServiceErrorMessage)) {
                     window.showErrorMessage(err.message);
@@ -108,11 +109,12 @@ export class DfmPreviewProcessor {
         this._docfxPreviewFilePath = ConstVariable.filePathPrefix + path.join(workspacePath, config["outputFolder"], config["buildOutputSubFolder"], path.dirname(relativePath).substring(config["buildSourceFolder"].length), ConstVariable.docfxTempPreviewFile);
 
         if (!fs.existsSync(builtHtmlPath)) {
-            // TODO: add a switch to control this
+            // TODO: build project in the background
             window.showErrorMessage("Please build this project first!");
+            window.showInformationMessage("You can press 'ctrl+k, b' to build the project in the background!")
         }
 
-        this._pageRefreshJsFilePath = this._context.asAbsolutePath(path.join("htmlUpdate.js"));
+        this._pageRefreshJsFilePath = this._context.asAbsolutePath(path.join("media", "js", "htmlUpdate.js"));
     }
 
     private parseConfig(workspacePath: string) {
@@ -146,8 +148,8 @@ export class DfmPreviewProcessor {
         if (customeConfig["outputFolder"] != null)
             config["outputFolder"] = customeConfig["outputFolder"];
 
-        if (customeConfig["docfxServerPort"] != null)
-            config["docfxServerPort"] = customeConfig["docfxServerPort"];
+        if (customeConfig["serverPort"] != null)
+            config["serverPort"] = customeConfig["serverPort"];
 
         if (customeConfig["navigationPort"] != null)
             config["navigationPort"] = customeConfig["navigationPort"];
@@ -158,8 +160,8 @@ export class DfmPreviewProcessor {
         // TODO: make path configurable
         let exePath = this._context.asAbsolutePath("./DfmParse/DfmHttpService.exe");
         try {
-            // TODO: make it "-p this._docfxServerPort"
-            this._spawn = Common.spawn(exePath + " " + this._docfxServerPort, {});
+            // TODO: make it "-p this._serverPort"
+            this._spawn = Common.spawn(exePath + " " + this._serverPort, {});
         }
         catch (err) {
             window.showErrorMessage(err);
@@ -194,12 +196,11 @@ export class DfmPreviewProcessor {
             filePath = fileName.substr(rootPathLength + 1, fileName.length - rootPathLength);
         }
         if (doc.languageId === "markdown") {
-            let numOfRow = doc.lineCount;
             if (isFirstTime) {
                 this._isFirstTime = true;
-                this.sendHttpRequest(rootPath, filePath, numOfRow, docContent, true);
+                this.sendHttpRequest(rootPath, filePath, docContent, true);
             } else {
-                this.sendHttpRequest(rootPath, filePath, numOfRow, docContent);
+                this.sendHttpRequest(rootPath, filePath, docContent);
             }
         }
     }
@@ -214,9 +215,9 @@ export class DfmPreviewProcessor {
         }
     }
 
-    private sendHttpRequest(rootPath: string, filePath: string, numOfRow: number, docContent: string, isFirstTime = false) {
+    private sendHttpRequest(rootPath: string, filePath: string, docContent: string, isFirstTime = false) {
         let that = this;
-        DfmService.preview(this._docfxServerPort, this._docfxPreviewFilePath, rootPath, filePath, docContent, isFirstTime, this._pageRefreshJsFilePath, this._builtHtmlPath)
+        DfmService.preview(this._serverPort, this._docfxPreviewFilePath, rootPath, filePath, docContent, isFirstTime, this._pageRefreshJsFilePath, this._builtHtmlPath)
             .then(function (res: any) {
                 that.httpServiceResponse = res.data;
                 that.isMarkdownFileChange = true;
